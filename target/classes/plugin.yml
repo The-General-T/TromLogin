@@ -1,0 +1,23 @@
+name: TromLogin
+version: '1.1'
+main: me.generalt.tromlogin.TromLogin
+api-version: '1.19'
+load: STARTUP
+
+
+permissions:
+  'tromlogin.broadcast':
+    description: 'Broadcasts the join/quit messages'
+    default: false
+  'tromlogin.bypass':
+    default: op
+    description: Bypasses welcome message.
+
+commands:
+  tlreloadconf:
+    description: Reloads the plugin configuration
+    permission: tromlogin.reload
+    permission-message: "&cYou do not have permission to run this command, bozo."
+  tltest:
+    description: Tests the messages.
+    permission: tromlogin.test
