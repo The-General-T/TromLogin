@@ -1,81 +1,66 @@
 package me.generalt.tromlogin;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 
+import static java.util.Objects.requireNonNull;
+import static net.kyori.adventure.text.minimessage.MiniMessage.miniMessage;
 
 public class TromLogin extends JavaPlugin implements Listener {
-    FileConfiguration config = getConfig();
-
+    Component parsedMessage(String path, @Nullable Player p) {
+        Component msg = miniMessage().deserialize(requireNonNull(getConfig().getString("prefix"))).append(miniMessage().deserialize(requireNonNull(getConfig().getString(path))));
+        if (msg.contains(Component.text("{player}")) && p != null)
+            msg = Component.text(msg.toString().replace("{player}", p.getName()));
+        return msg;
+    }
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
         saveDefaultConfig();
-        getLogger().info(ChatColor.translateAlternateColorCodes('&',config.getString("prefix")+"TromLogin has been enabled!"));
+        getLogger().info("TromLogin has been enabled!");
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        FileConfiguration config = getConfig();
-        if (event.getPlayer().hasPermission("tromlogin.bypass")) {
-            return;
-        }
-
-        if (config.getBoolean("broadcastWelcomeMessage")) {
-            String welcomeMessage = config.getString("joinMessage");
-            welcomeMessage = welcomeMessage.replace("{player}", event.getPlayer().getName());
-
-            if (event.getPlayer().hasPermission("tromlogin.broadcast")) {
-                getServer().broadcastMessage(welcomeMessage);
-            }
-        }
+        Player p = event.getPlayer();
+        if (getConfig().getBoolean("broadcastWelcomeMessage") && !p.hasPermission("tromlogin.bypass") && p.hasPermission("tromlogin.broadcast"))
+            getServer().broadcast(parsedMessage("joinMessage", p));
     }
+
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        FileConfiguration config = getConfig();
-
-        if (config.getBoolean("broadcastWelcomeMessage")) {
-            String leaveMessage = config.getString("leaveMessage");
-            leaveMessage = leaveMessage.replace("{player}", event.getPlayer().getName());
-
-            if (event.getPlayer().hasPermission("tromlogin.broadcast")) {
-                getServer().broadcastMessage(leaveMessage);
-            }
-        }
+        Player p = event.getPlayer();
+        if (getConfig().getBoolean("broadcastWelcomeMessage") && !p.hasPermission("tromlogin.bypass") && p.hasPermission("tromlogin.broadcast"))
+            getServer().broadcast(parsedMessage("leaveMessage", p));
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        FileConfiguration config = getConfig();
-        if (cmd.getName().equalsIgnoreCase("tlreloadconf")) {
-            // Check if the sender has permission to reload the plugin
-            if (!sender.hasPermission("tromlogin.reload")) {
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',config.getString("prefix")+"You do not have permission."));
+    public boolean onCommand(@NotNull CommandSender sender, Command cmd, @NotNull String label, String[] args) {
+        switch (cmd.getName().toLowerCase()) {
+            case "tlreloadconf":
+                if (!sender.hasPermission("tromlogin.reload")) {
+                    reloadConfig(); // Reload the configuration
+                    sender.sendMessage(parsedMessage("reloadConfig", null));
+                    return true;
+                }
+            case "tltest":
+                if (sender.hasPermission("tromlogin.test")) {
+                    sender.sendMessage(parsedMessage("joinMessage", (Player) sender));
+                    sender.sendMessage(parsedMessage("leaveMessage", (Player) sender));
+                    return true;
+                }
+            default:
+                sender.sendMessage(parsedMessage("noPermission", null));
                 return true;
-            }
-
-            reloadConfig(); // Reload the configuration
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&',config.getString("prefix")+"Plugin configuration reloaded."));
-            return true;
         }
-        if (cmd.getName().equalsIgnoreCase("tltest")) {
-            if (!sender.hasPermission("tromlogin.test")) {
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&',config.getString("prefix")+"You do not have permission."));
-                return true;
-            }
-
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&',config.getString("joinMessage")));
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&',config.getString("leaveMessage")));
-            return true;
-        }
-        return false;
     }
 }

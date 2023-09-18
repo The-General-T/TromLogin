@@ -10,8 +10,8 @@ permissions:
     description: 'Broadcasts the join/quit messages'
     default: false
   'tromlogin.bypass':
-    default: op
     description: Bypasses welcome message.
+    default: op
 
 commands:
   tlreloadconf:
