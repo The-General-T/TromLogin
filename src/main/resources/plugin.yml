@@ -2,8 +2,6 @@ name: TromLogin
 version: '${project.version}'
 main: me.generalt.tromlogin.TromLogin
 api-version: '1.19'
-load: STARTUP
-
 
 permissions:
   'tromlogin.broadcast':
@@ -14,10 +12,12 @@ permissions:
     default: op
 
 commands:
-  tlreloadconf:
-    description: Reloads the plugin configuration
-    permission: tromlogin.reload
+  tromlogin:
+    aliases: tl
     permission-message: "&cYou do not have permission to run this command, bozo."
-  tltest:
-    description: Tests the messages.
-    permission: tromlogin.test
+    reload:
+      description: Reloads the plugin configuration
+      permission: tromlogin.reload
+    test:
+      description: Tests the messages.
+      permission: tromlogin.test
