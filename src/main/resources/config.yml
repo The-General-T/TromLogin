@@ -4,15 +4,17 @@
 ##############################################
 
 # Sets the plugins prefix
-prefix: '&a&lTROMLOGIN &8| &r'
+prefix: '<red><b>TROMLOGIN</red> <dark_gray>| <reset>'
 
 # Toggles if the message even broadcasts.
 broadcastWelcomeMessage: true
 
-# Sets the Join and Quit messages.
-# use {player} for the players username.
-# This plugin only supports the "legacy" format (&x&r&r&g&g&b&b)
+# Sets the messages used for the plugin.
+# Use {player} for the player's username.
+# This plugin only supports MiniMessage formatting: https://docs.advntr.dev/minimessage/format.html
 
-# Example: joinMessage: "&x&f&f&e&0&0&0Welcome, &x&f&f&a&5&0&0{player}! &x&3&2&c&d&3&2Enjoy your time on the server!"
+# Example: joinMessage: "<green>Welcome, <rainbow><b>{player}</b></rainbow! Enjoy your time on the server!"
 joinMessage: "Welcome, {player}! Enjoy your time on the server!"
 leaveMessage: "{player} has left!"
+noPermission: "<red>You do not have permission."
+reloadPlugin: "<green>Reloaded the plugin!"
